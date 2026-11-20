@@ -43,6 +43,31 @@ header{display:flex;align-items:center;gap:14px;padding:8px 14px;border-bottom:1
 #lbody .p{color:var(--P);font-weight:600} #lbody .i{color:var(--I);font-weight:600} #lbody .d{color:var(--D);font-weight:600}
 #lbody .e{color:var(--E);font-weight:600} #lbody .sp{color:var(--SP);font-weight:600}
 .lnav{display:flex;flex-direction:column;gap:4px;justify-content:center}
+.chip.base{border-style:dashed;color:#c9d4e8}
+.chip.customchip{cursor:default;border-color:var(--E);background:#3a3110;color:#ffe69a}
+.chip.customchip[hidden]{display:none!important}
+
+#tune{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;padding:8px 14px;border-bottom:1px solid var(--line);background:#0f182c}
+.tscen{min-width:210px;max-width:260px;display:flex;flex-direction:column;line-height:1.2}
+.tscen small{color:var(--mut);font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;font-weight:600}
+#scenName{font-weight:700;font-size:15px;color:var(--fg)}
+#scenName.custom{color:var(--E)}
+#scenSub{font-size:11.5px;color:var(--mut)}
+.tg{display:flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;padding:5px 10px;flex:1 1 250px;min-width:0;transition:opacity .2s}
+.tg.p{--c:var(--P)} .tg.i{--c:var(--I)} .tg.d{--c:var(--D)} .tg.x{--c:#5a6a88;flex:0 1 auto;gap:12px}
+.tg .badge{width:24px;height:24px;font-size:14px;border-radius:6px}
+.tlab{font-size:13px;color:var(--mut);white-space:nowrap}
+.tg input[type=range]{flex:1;min-width:60px;accent-color:var(--c)}
+.tnum{width:72px;background:var(--bg);border:1px solid #2e3f63;border-radius:7px;padding:4px 6px;font-weight:700;font-size:15px;color:var(--c);text-align:right;font-variant-numeric:tabular-nums}
+.tnum:focus{outline:2px solid var(--c);outline-offset:1px}
+.tnum.changed{border-color:var(--E);box-shadow:0 0 0 1px var(--E)}
+.tdef{font-size:10.5px;color:var(--E);white-space:nowrap;min-width:0}
+.tdef:empty{display:none}
+.tg.off .tlab,.tg.off input[type=range],.tg.off .tnum,.tg.off .badge{opacity:.35}
+body.bang .tg.p,body.bang .tg.i,body.bang .tg.d{opacity:.45}
+.tnz{display:flex;align-items:center;gap:6px;color:var(--mut);font-size:12.5px}
+.tnz input{width:90px}
+.tnz output{min-width:56px;font-size:12.5px;color:var(--fg)}
 
 main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.04fr) minmax(0,1fr);gap:10px;padding:10px}
 .col{display:flex;flex-direction:column;gap:8px;min-height:0;min-width:0}
@@ -97,15 +122,12 @@ tr.hid td{opacity:.35}
 .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .card{padding:8px 10px 8px;border-top:3px solid var(--c);transition:opacity .2s}
 .card.p{--c:var(--P)} .card.i{--c:var(--I)} .card.d{--c:var(--D)}
-.card.off .mini,.card.off .val,.card.off .gain{opacity:.35}
+.card.off .mini,.card.off .val{opacity:.35}
 .ctop{display:flex;align-items:center;gap:8px}
 .badge{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:17px;background:var(--c);color:#0b1220;flex:none}
 .ctop div{flex:1;min-width:0;line-height:1.15}
 .ctop b{font-size:14px}
 .ctop small{display:block;color:var(--c);font-size:11px;letter-spacing:.6px;font-weight:600}
-.gain{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12.5px;color:var(--mut)}
-.gain input{flex:1;min-width:0;accent-color:var(--c)}
-.gain output{min-width:44px;text-align:right;color:var(--fg);font-weight:600}
 .mini{height:62px;margin-top:4px}
 .val{font-size:12px;color:var(--mut);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .val b{color:var(--c)}
@@ -156,6 +178,32 @@ body.bang .bangveil{display:grid}
   <div class="lnav"><button class="btn" id="prevL" title="←">◀ Prev</button><button class="btn primary" id="nextL" title="→">Next ▶</button></div>
 </section>
 
+<section id="tune" aria-label="PID parameters">
+  <div class="tscen"><small>Simulation settings</small><div id="scenName"></div><div id="scenSub"></div></div>
+  <div class="tg p" id="tgP">
+    <label class="sw" title="Turn the P term on or off (key 1)"><input type="checkbox" id="onP" checked><i></i></label>
+    <span class="badge">P</span><label class="tlab" for="kp">K<sub>p</sub></label>
+    <input type="range" id="kp" aria-label="Kp"><input type="number" id="kpNum" class="tnum" aria-label="Kp value" inputmode="decimal">
+    <span class="tdef" id="kpDef"></span>
+  </div>
+  <div class="tg i" id="tgI">
+    <label class="sw" title="Turn the I term on or off (key 2)"><input type="checkbox" id="onI" checked><i></i></label>
+    <span class="badge">I</span><label class="tlab" for="ki">K<sub>i</sub></label>
+    <input type="range" id="ki" aria-label="Ki"><input type="number" id="kiNum" class="tnum" aria-label="Ki value" inputmode="decimal">
+    <span class="tdef" id="kiDef"></span>
+  </div>
+  <div class="tg d" id="tgD">
+    <label class="sw" title="Turn the D term on or off (key 3)"><input type="checkbox" id="onD" checked><i></i></label>
+    <span class="badge">D</span><label class="tlab" for="kd">K<sub>d</sub></label>
+    <input type="range" id="kd" aria-label="Kd"><input type="number" id="kdNum" class="tnum" aria-label="Kd value" inputmode="decimal">
+    <span class="tdef" id="kdDef"></span>
+  </div>
+  <div class="tg x">
+    <label class="sw" title="Stops the integral from accumulating while the actuator is maxed out"><input type="checkbox" id="aw" checked><i></i>Anti-windup</label>
+    <span class="tnz"><label for="noise">Sensor noise</label><input type="range" id="noise" min="0" max="1" step="0.01" value="0"><output id="noiseOut" class="num">off</output></span>
+  </div>
+</section>
+
 <main>
   <div class="col">
     <div class="panel scene"><canvas id="scene"></canvas><div class="hint" id="hint"></div></div>
@@ -172,9 +220,6 @@ body.bang .bangveil{display:grid}
       <button class="btn" id="resetBtn" title="R">⟲ Reset</button>
       <span class="sep"></span>
       <span class="grp" id="distGrp"></span>
-      <span class="sep"></span>
-      <span class="grp"><label for="noise">Sensor noise</label><input type="range" id="noise" min="0" max="1" step="0.01" value="0" style="width:90px"><output id="noiseOut" class="num" style="min-width:52px;font-size:12.5px">0</output></span>
-      <label class="sw" title="Stops the integral from accumulating while the actuator is maxed out"><input type="checkbox" id="aw" checked><i></i>Anti-windup</label>
     </div>
     <div class="panel tests">
       <div class="thead"><b>Test bench <small>· step response from rest · metrics use a ±5% settling band</small></b><button class="btn" id="clearTests">Clear</button></div>
@@ -186,22 +231,19 @@ body.bang .bangveil{display:grid}
   <div class="col">
     <div class="cards">
       <div class="panel card p" id="cardP">
-        <div class="ctop"><span class="badge">P</span><div><b>Proportional</b><small>PRESENT · how far off now</small></div><label class="sw"><input type="checkbox" id="onP" checked><i></i></label></div>
-        <div class="gain">K<sub>p</sub><input type="range" id="kp"><output id="kpOut" class="num"></output></div>
+        <div class="ctop"><span class="badge">P</span><div><b>Proportional</b><small>PRESENT · how far off now</small></div></div>
         <canvas class="mini" id="miniP"></canvas>
         <div class="val num" id="valP"></div>
         <div class="bangveil">Bang-bang ignores how big the error is — only its sign.</div>
       </div>
       <div class="panel card i" id="cardI">
-        <div class="ctop"><span class="badge">I</span><div><b>Integral</b><small>PAST · error piled up over time</small></div><label class="sw"><input type="checkbox" id="onI" checked><i></i></label></div>
-        <div class="gain">K<sub>i</sub><input type="range" id="ki"><output id="kiOut" class="num"></output></div>
+        <div class="ctop"><span class="badge">I</span><div><b>Integral</b><small>PAST · error piled up over time</small></div></div>
         <canvas class="mini" id="miniI"></canvas>
         <div class="val num" id="valI"></div>
         <div class="bangveil">No memory of past error in bang-bang.</div>
       </div>
       <div class="panel card d" id="cardD">
-        <div class="ctop"><span class="badge">D</span><div><b>Derivative</b><small>FUTURE · where error is heading</small></div><label class="sw"><input type="checkbox" id="onD" checked><i></i></label></div>
-        <div class="gain">K<sub>d</sub><input type="range" id="kd"><output id="kdOut" class="num"></output></div>
+        <div class="ctop"><span class="badge">D</span><div><b>Derivative</b><small>FUTURE · where error is heading</small></div></div>
         <canvas class="mini" id="miniD"></canvas>
         <div class="val num" id="valD"></div>
         <div class="bangveil">No look-ahead in bang-bang, so it always overshoots.</div>
@@ -366,7 +408,7 @@ const state = {
   g:{ drone:{...SYSTEMS.drone.g0}, pend:{...SYSTEMS.pend.g0} },
   on:{p:true, i:true, d:true}, aw:true,
   noise:{drone:0, pend:0},
-  lesson:{drone:-1, pend:-1},
+  lesson:{drone:-1, pend:-1}, custom:{drone:false, pend:false},
   tests:{drone:[], pend:[]}, colorIdx:{drone:0, pend:0},
 };
 const S = () => SYSTEMS[state.sys];
@@ -517,15 +559,26 @@ $('#tbody').addEventListener('click', e => {
 $('#clearTests').onclick = () => { state.tests[state.sys] = []; state.colorIdx[state.sys] = 0; renderTests(); };
 
 // ---------------------------------------------------------------- UI wiring
+function scenarioDefaults(){
+  const sys = S(), i = state.lesson[state.sys];
+  if (i < 0) return { mode:'pid', g:{...sys.g0}, on:{p:true, i:true, d:true}, aw:true, noise:0 };
+  const c = LESSONS[state.sys][i].cfg, mode = c.mode || 'pid';
+  return { mode, g: mode==='pid' ? { kp:c.kp ?? 0, ki:c.ki ?? 0, kd:c.kd ?? 0 } : null,
+           on: c.on ? { p:c.on.includes('p'), i:c.on.includes('i'), d:c.on.includes('d') } : null, aw: c.aw ?? true, noise: c.noise ?? 0 };
+}
 function syncGainsUI(){
-  const sys = S(), g = state.g[state.sys];
+  const sys = S(), g = state.g[state.sys], custom = state.custom[state.sys], def = scenarioDefaults();
   for (const k of ['kp','ki','kd']){
-    const el = $('#'+k), sp = sys.gains[k];
+    const el = $('#'+k), num = $('#'+k+'Num'), sp = sys.gains[k];
     el.min = 0; el.max = sp.max; el.step = sp.step; el.value = g[k];
-    $('#'+k+'Out').textContent = fmt(g[k], sp.dec);
+    num.min = 0; num.max = sp.max; num.step = sp.step;
+    if (document.activeElement !== num) num.value = fmt(g[k], sp.dec);
+    const changed = custom && def.g && Math.abs(def.g[k] - g[k]) > 1e-9;
+    num.classList.toggle('changed', !!changed);
+    $('#'+k+'Def').textContent = changed ? `preset ${fmt(def.g[k], sp.dec)}` : '';
   }
   $('#onP').checked = state.on.p; $('#onI').checked = state.on.i; $('#onD').checked = state.on.d;
-  for (const k of ['p','i','d']) $('#card'+k.toUpperCase()).classList.toggle('off', !state.on[k]);
+  for (const k of ['p','i','d']){ const K = k.toUpperCase(); $('#card'+K).classList.toggle('off', !state.on[k]); $('#tg'+K).classList.toggle('off', !state.on[k]); }
   $('#aw').checked = state.aw;
   const nz = $('#noise'); nz.max = sys.noiseMax; nz.step = sys.noiseStep; nz.value = state.noise[state.sys];
   $('#noiseOut').textContent = state.noise[state.sys] ? '±'+fmt(state.noise[state.sys],2)+' '+sys.unit : 'off';
@@ -534,23 +587,43 @@ function syncGainsUI(){
   document.querySelectorAll('#sysSeg button').forEach(b => b.classList.toggle('on', b.dataset.sys===state.sys));
   $('#eqUlbl').textContent = sys.uName;
   $('#hint').textContent = sys.hint;
+  // scenario name
+  const i = state.lesson[state.sys], sn = $('#scenName');
+  sn.classList.toggle('custom', custom);
+  sn.textContent = custom ? '✎ Custom PID tuning' : i < 0 ? 'Free play · default PID' : `${i+1}. ${LESSONS[state.sys][i].t}`;
+  $('#scenSub').textContent = state.mode==='bang' ? `Bang-bang (±${sys.bang.band} ${sys.unit}): gains not used. Move a slider to switch to PID`
+    : custom ? 'Your values are live. Click a scenario to restore its preset'
+    : 'Preset values loaded. Change any value to tune it yourself';
+}
+function setGain(k, v){
+  const sp = S().gains[k];
+  if (!isFinite(v)) return;
+  state.g[state.sys][k] = clamp(v, 0, sp.max);
+  const term = k[1];                       // 'kp' -> 'p'
+  if (v > 0 && !state.on[term]) state.on[term] = true;   // raising a gain switches its term on
+  if (state.mode==='bang'){ state.mode = 'pid'; sim.bangHi = false; }
+  markEdited();
 }
 for (const k of ['kp','ki','kd']){
-  $('#'+k).addEventListener('input', e => { state.g[state.sys][k] = +e.target.value; $('#'+k+'Out').textContent = fmt(+e.target.value, S().gains[k].dec); markEdited(); });
+  $('#'+k).addEventListener('input', e => setGain(k, +e.target.value));
+  const num = $('#'+k+'Num');
+  num.addEventListener('input', e => { if (e.target.value !== '' && isFinite(+e.target.value)) setGain(k, +e.target.value); });
+  num.addEventListener('change', e => { if (e.target.value === '' || !isFinite(+e.target.value)) e.target.value = fmt(state.g[state.sys][k], S().gains[k].dec); else setGain(k, +e.target.value); e.target.value = fmt(state.g[state.sys][k], S().gains[k].dec); });
+  num.addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); });
 }
 for (const k of ['p','i','d']){
-  $('#on'+k.toUpperCase()).addEventListener('change', e => { state.on[k] = e.target.checked; if (state.mode==='bang' && e.target.checked){ state.mode='pid'; } syncGainsUI(); markEdited(); });
+  $('#on'+k.toUpperCase()).addEventListener('change', e => { state.on[k] = e.target.checked; if (state.mode==='bang'){ state.mode='pid'; sim.bangHi=false; } markEdited(); });
 }
 $('#aw').addEventListener('change', e => { state.aw = e.target.checked; markEdited(); });
-$('#noise').addEventListener('input', e => { state.noise[state.sys] = +e.target.value; syncGainsUI(); markEdited(); });
-document.querySelectorAll('#modeSeg button').forEach(b => b.onclick = () => { state.mode = b.dataset.mode; sim.bangHi=false; syncGainsUI(); markEdited(); });
+$('#noise').addEventListener('input', e => { state.noise[state.sys] = +e.target.value; markEdited(); });
+document.querySelectorAll('#modeSeg button').forEach(b => b.onclick = () => { if (state.mode === b.dataset.mode) return; state.mode = b.dataset.mode; sim.bangHi=false; markEdited(); });
 document.querySelectorAll('#sysSeg button').forEach(b => b.onclick = () => switchSys(b.dataset.sys));
 document.querySelectorAll('#speedSeg button').forEach(b => b.onclick = () => { state.speed = +b.dataset.s; document.querySelectorAll('#speedSeg button').forEach(x => x.classList.toggle('on', x===b)); });
 $('#pauseBtn').onclick = () => { state.paused = !state.paused; syncPause(); };
 function syncPause(){ $('#pauseBtn').textContent = state.paused ? '▶ Resume' : '⏸ Pause'; }
 $('#resetBtn').onclick = () => { newSim(); syncDist(); };
 $('#testBtn').onclick = () => runTest();
-function markEdited(){ /* lesson stays highlighted, but tests get auto-labels from current settings */ }
+function markEdited(){ state.custom[state.sys] = true; syncLesson(); syncGainsUI(); }
 
 function buildDist(){
   const grp = $('#distGrp'); grp.innerHTML = '';
@@ -574,12 +647,18 @@ function buildLessons(){
     const b = document.createElement('button'); b.className = 'chip'; b.innerHTML = `<b>${i+1}</b>${l.t}`;
     b.onclick = () => applyLesson(i); ch.appendChild(b);
   });
+  const cc = document.createElement('span'); cc.className = 'chip customchip'; cc.id = 'customChip'; cc.textContent = '✎ Custom PID tuning'; cc.hidden = true; ch.appendChild(cc);
   syncLesson();
 }
 function syncLesson(){
-  const i = state.lesson[state.sys], L = LESSONS[state.sys];
-  document.querySelectorAll('#chips .chip').forEach((c, k) => c.classList.toggle('on', k===i));
-  if (i < 0){
+  const i = state.lesson[state.sys], L = LESSONS[state.sys], custom = state.custom[state.sys];
+  document.querySelectorAll('#chips button.chip').forEach((c, k) => { c.classList.toggle('on', k===i && !custom); c.classList.toggle('base', k===i && custom); });
+  $('#customChip').hidden = !custom;
+  if (custom){
+    const base = i < 0 ? 'free play' : `${i+1}. ${L[i].t}`;
+    $('#ltitle').innerHTML = `✎ Custom PID tuning<span class="slide">started from ${base}</span>`;
+    $('#lbody').innerHTML = 'You changed the settings, and the simulation is running on <b>your values</b> right now (changed values are outlined in yellow). Press <b>▶ Run step test</b> (or <b>T</b>) to score your tuning on the test bench. Click any scenario button to restore its preset values.';
+  } else if (i < 0){
     $('#ltitle').innerHTML = state.sys==='drone' ? 'Free play: quadcopter altitude hold' : 'Free play: motor-driven pendulum arm';
     $('#lbody').innerHTML = state.sys==='drone'
       ? 'This walks through the lecture step by step. Pick a lesson (or press <b>→</b>) to load its gains and run a step test. Each run is kept on the response plot so you can compare. The drone needs <b>100 RPM to hover</b>, just like slide 13.'
@@ -593,7 +672,7 @@ function syncLesson(){
 }
 function applyLesson(i){
   const L = LESSONS[state.sys]; if (i < 0 || i >= L.length) return;
-  state.lesson[state.sys] = i;
+  state.lesson[state.sys] = i; state.custom[state.sys] = false;
   const l = L[i], c = l.cfg, sys = S();
   state.mode = c.mode || 'pid';
   if (state.mode==='pid'){
@@ -617,12 +696,13 @@ function switchSys(k){
 
 window.addEventListener('keydown', e => {
   if (e.target.tagName==='INPUT' && e.target.type!=='checkbox' && e.target.type!=='range') return;
+  if (e.target.tagName==='INPUT' && e.target.type==='range' && (e.key==='ArrowLeft'||e.key==='ArrowRight')) return;
   if (e.key===' '){ e.preventDefault(); state.paused=!state.paused; syncPause(); }
   else if (e.key==='r'||e.key==='R'){ newSim(); syncDist(); }
   else if (e.key==='t'||e.key==='T') runTest();
   else if (e.key==='ArrowRight'){ e.preventDefault(); applyLesson(state.lesson[state.sys]+1); }
   else if (e.key==='ArrowLeft'){ e.preventDefault(); applyLesson(state.lesson[state.sys]-1); }
-  else if (e.key==='1'||e.key==='2'||e.key==='3'){ const k='pid'[+e.key-1]; state.on[k]=!state.on[k]; if(state.mode==='bang') state.mode='pid'; syncGainsUI(); }
+  else if (e.key==='1'||e.key==='2'||e.key==='3'){ const k='pid'[+e.key-1]; state.on[k]=!state.on[k]; if(state.mode==='bang'){ state.mode='pid'; sim.bangHi=false; } markEdited(); }
   else if (e.key==='g'||e.key==='G'){ const d=S().disturb[0]; d.fire(sim.plant, sim); }
 });
 
