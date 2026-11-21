@@ -9,158 +9,205 @@
   --bg:#0b1220; --panel:#121b2e; --panel2:#17223a; --line:#24324f; --fg:#e8eef8; --mut:#8a9bbb; --dim:#5a6a88;
   --P:#3fa9ff; --I:#b07cff; --D:#ff8a3d; --SP:#3ddc84; --E:#ffd23f; --PV:#f4f7fc; --bad:#ff5d6c; --ok:#ffcf4a; --good:#3ddc84;
 }
+/* Layout: fixed-height top chrome (header / scenarios / lesson text / gains), then a two-column stage that always fills the rest of the window */
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-body{height:100vh;display:flex;flex-direction:column;overflow:hidden}
+html,body{height:100%}
+body{display:flex;flex-direction:column;overflow:hidden}
 button,input,select{font:inherit;color:inherit}
 .num{font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid #7aa2ff;outline-offset:2px}
 
-header{display:flex;align-items:center;gap:14px;padding:8px 14px;border-bottom:1px solid var(--line);background:#0e1628;flex-wrap:wrap}
-.brand{display:flex;align-items:baseline;gap:10px;margin-right:auto}
+/* ---- row 1: header */
+header{flex:none;display:flex;align-items:center;gap:12px;padding:6px 14px;border-bottom:1px solid var(--line);background:#0e1628;white-space:nowrap}
+.brand{display:flex;align-items:baseline;gap:10px;margin-right:auto;min-width:0}
 .brand b{font-size:19px;letter-spacing:.2px}
 .brand b span{color:var(--P)} .brand b span+span{color:var(--I)} .brand b span+span+span{color:var(--D)}
-.brand small{color:var(--mut)}
-.seg{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
-.seg button{background:none;border:0;padding:6px 12px;border-radius:7px;cursor:pointer;color:var(--mut);white-space:nowrap}
+.brand small{color:var(--mut);overflow:hidden;text-overflow:ellipsis}
+.seg{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;flex:none}
+.seg button{background:none;border:0;padding:5px 12px;border-radius:7px;cursor:pointer;color:var(--mut);white-space:nowrap}
 .seg button.on{background:var(--panel2);color:var(--fg);box-shadow:inset 0 0 0 1px #34476e}
-.seg.small button{padding:4px 8px;font-size:12.5px}
-.btn{background:var(--panel2);border:1px solid #2e3f63;border-radius:9px;padding:6px 12px;cursor:pointer;white-space:nowrap}
+.seg.small button{padding:3px 8px;font-size:12.5px}
+.btn{background:var(--panel2);border:1px solid #2e3f63;border-radius:9px;padding:5px 12px;cursor:pointer;white-space:nowrap;flex:none}
 .btn:hover{border-color:#4a6195}
 .btn.primary{background:linear-gradient(#2b74d6,#1f5bb0);border-color:#3b86ea;font-weight:600}
 .btn.on{background:#3a2a12;border-color:var(--D);color:#ffd2b0}
 .btn:disabled{opacity:.45;cursor:default}
+.btn.sm{padding:3px 10px;font-size:13px}
 
-#lesson{display:flex;gap:12px;align-items:stretch;padding:8px 14px;border-bottom:1px solid var(--line);background:#0d1526}
-#chips{display:flex;gap:4px;flex-wrap:wrap;align-content:flex-start;max-width:46%}
-.chip{border:1px solid var(--line);background:var(--panel);color:var(--mut);border-radius:8px;padding:4px 8px;cursor:pointer;font-size:12.5px;white-space:nowrap}
+/* ---- row 2: scenario buttons (one line, scrolls sideways if needed) */
+#lesson{flex:none;display:flex;align-items:center;gap:10px;padding:5px 14px;background:#0d1526}
+.chiplabel{color:var(--mut);font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;font-weight:600;flex:none}
+#chips{display:flex;gap:4px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin;padding-block:2px}
+.chip{border:1px solid var(--line);background:var(--panel);color:var(--mut);border-radius:8px;padding:3px 8px;cursor:pointer;font-size:12.5px;white-space:nowrap;flex:none}
 .chip b{color:var(--dim);margin-right:4px}
 .chip.on{background:#1b2b4b;color:var(--fg);border-color:#4a6aa8}
 .chip.on b{color:var(--E)}
-#ltext{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
-#ltitle{font-weight:700;font-size:15px}
-#ltitle .slide{font-weight:500;font-size:11.5px;color:var(--mut);border:1px solid var(--line);border-radius:6px;padding:1px 6px;margin-left:8px;vertical-align:2px}
-#lbody{color:#c9d4e8;font-size:13.5px;margin-top:2px}
-#lbody .p{color:var(--P);font-weight:600} #lbody .i{color:var(--I);font-weight:600} #lbody .d{color:var(--D);font-weight:600}
-#lbody .e{color:var(--E);font-weight:600} #lbody .sp{color:var(--SP);font-weight:600}
-.lnav{display:flex;flex-direction:column;gap:4px;justify-content:center}
 .chip.base{border-style:dashed;color:#c9d4e8}
 .chip.customchip{cursor:default;border-color:var(--E);background:#3a3110;color:#ffe69a}
 .chip.customchip[hidden]{display:none!important}
+.lnav{display:flex;gap:6px;flex:none}
 
-#tune{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;padding:8px 14px;border-bottom:1px solid var(--line);background:#0f182c}
-.tscen{min-width:210px;max-width:260px;display:flex;flex-direction:column;line-height:1.2}
+/* ---- row 3: lesson text, always exactly two lines tall */
+#ltext{flex:none;height:calc(2 * 1.35em + 10px);font-size:13.5px;line-height:1.35;padding:4px 14px 6px;overflow-y:auto;color:#c9d4e8;background:#0d1526;border-bottom:1px solid var(--line);scrollbar-width:thin}
+#ltitle{font-weight:700;color:var(--fg);margin-right:6px}
+#ltitle .slide{font-weight:500;font-size:11px;color:var(--mut);border:1px solid var(--line);border-radius:6px;padding:0 6px;margin-left:6px;vertical-align:1px}
+#lbody .p{color:var(--P);font-weight:600} #lbody .i{color:var(--I);font-weight:600} #lbody .d{color:var(--D);font-weight:600}
+#lbody .e{color:var(--E);font-weight:600} #lbody .sp{color:var(--SP);font-weight:600}
+
+/* ---- row 4: gains bar, one line with a fixed height */
+#tune{flex:none;height:54px;display:flex;align-items:center;gap:8px;padding:0 14px;border-bottom:1px solid var(--line);background:#0f182c}
+.tscen{width:178px;flex:none;display:flex;flex-direction:column;line-height:1.2;min-width:0}
 .tscen small{color:var(--mut);font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;font-weight:600}
-#scenName{font-weight:700;font-size:15px;color:var(--fg)}
+#scenName,#scenSub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#scenName{font-weight:700;font-size:14.5px;color:var(--fg)}
 #scenName.custom{color:var(--E)}
-#scenSub{font-size:11.5px;color:var(--mut)}
-.tg{display:flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;padding:5px 10px;flex:1 1 250px;min-width:0;transition:opacity .2s}
-.tg.p{--c:var(--P)} .tg.i{--c:var(--I)} .tg.d{--c:var(--D)} .tg.x{--c:#5a6a88;flex:0 1 auto;gap:12px}
-.tg .badge{width:24px;height:24px;font-size:14px;border-radius:6px}
-.tlab{font-size:13px;color:var(--mut);white-space:nowrap}
-.tg input[type=range]{flex:1;min-width:60px;accent-color:var(--c)}
-.tnum{width:72px;background:var(--bg);border:1px solid #2e3f63;border-radius:7px;padding:4px 6px;font-weight:700;font-size:15px;color:var(--c);text-align:right;font-variant-numeric:tabular-nums}
+#scenSub{font-size:11px;color:var(--mut)}
+.tg{position:relative;display:flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;padding:4px 9px;flex:1 1 0;min-width:0;height:38px;transition:opacity .2s}
+.tg.p{--c:var(--P)} .tg.i{--c:var(--I)} .tg.d{--c:var(--D)} .tg.x{--c:#5a6a88;flex:0 0 auto;gap:10px}
+.tlab{font-size:14px;font-weight:700;color:var(--c);white-space:nowrap}
+.tg input[type=range]{flex:1;min-width:36px;accent-color:var(--c)}
+.tnum{width:66px;flex:none;background:var(--bg);border:1px solid #2e3f63;border-radius:7px;padding:3px 6px;font-weight:700;font-size:15px;color:var(--c);text-align:right;font-variant-numeric:tabular-nums}
 .tnum:focus{outline:2px solid var(--c);outline-offset:1px}
+.tnum{appearance:textfield;-moz-appearance:textfield}
+.tnum::-webkit-inner-spin-button,.tnum::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .tnum.changed{border-color:var(--E);box-shadow:0 0 0 1px var(--E)}
-.tdef{font-size:10.5px;color:var(--E);white-space:nowrap;min-width:0}
+.tdef{position:absolute;top:-9px;right:8px;font-size:10px;line-height:15px;padding:0 6px;border-radius:5px;background:#3a3110;border:1px solid #6b5a1a;color:var(--E);white-space:nowrap;pointer-events:none}
 .tdef:empty{display:none}
-.tg.off .tlab,.tg.off input[type=range],.tg.off .tnum,.tg.off .badge{opacity:.35}
+.tg.off .tlab,.tg.off input[type=range],.tg.off .tnum{opacity:.35}
 body.bang .tg.p,body.bang .tg.i,body.bang .tg.d{opacity:.45}
-.tnz{display:flex;align-items:center;gap:6px;color:var(--mut);font-size:12.5px}
-.tnz input{width:90px}
-.tnz output{min-width:56px;font-size:12.5px;color:var(--fg)}
+.tnz{display:flex;align-items:center;gap:6px;color:var(--mut);font-size:12.5px;white-space:nowrap}
+.tnz input{width:72px}
+.tnz output{min-width:50px;font-size:12.5px;color:var(--fg)}
 
-main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.04fr) minmax(0,1fr);gap:10px;padding:10px}
+/* ---- stage */
+main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.04fr) minmax(0,1fr);gap:8px;padding:8px 14px 10px}
 .col{display:flex;flex-direction:column;gap:8px;min-height:0;min-width:0}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;position:relative;overflow:hidden}
 canvas{display:block;width:100%;height:100%}
-.scene{flex:1;min-height:250px}
+.scene{flex:1;min-height:0}
 .hint{position:absolute;left:10px;bottom:8px;font-size:12px;color:#c3cee4;background:#0b1220b0;padding:3px 8px;border-radius:6px;pointer-events:none}
 
-.eqbar{display:flex;align-items:center;gap:6px;padding:6px 10px;flex-wrap:wrap}
+.eqbar{flex:none;display:flex;align-items:center;gap:6px;padding:5px 10px;flex-wrap:wrap}
 .eqbar .lbl{color:var(--mut);font-size:13px;font-style:italic;margin-right:2px}
-.eq{display:flex;flex-direction:column;align-items:center;border-radius:8px;padding:2px 10px;min-width:84px;border:1px solid transparent;transition:opacity .2s}
+.eq{display:flex;flex-direction:column;align-items:center;border-radius:8px;padding:1px 10px;min-width:84px;border:1px solid transparent;transition:opacity .2s}
 .eq small{font-size:11px;opacity:.85}
-.eq span{font-weight:700;font-size:17px}
+.eq span{font-weight:700;font-size:16px}
 .eq.p{background:#10294a;border-color:#1f4f86;color:var(--P)}
 .eq.i{background:#251a44;border-color:#4b3486;color:var(--I)}
 .eq.d{background:#3a2210;border-color:#7a4317;color:var(--D)}
 .eq.u{background:#1c2638;border-color:#3a4a6a;color:var(--PV)}
 .eq.off{opacity:.25}
 .op{color:var(--mut);font-size:18px}
-.wf{height:112px}
+.wf{flex:none;height:100px}
 
-.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 10px}
+.controls{flex:none;display:flex;align-items:center;gap:8px;flex-wrap:nowrap;overflow-x:auto;padding:6px 10px;scrollbar-width:thin}
 .controls .grp{display:flex;align-items:center;gap:6px}
-.controls label{color:var(--mut);font-size:12.5px}
-.sep{width:1px;height:24px;background:var(--line);margin:0 2px}
+.sep{width:1px;height:24px;background:var(--line);margin:0 2px;flex:none}
 input[type=range]{accent-color:#7aa2ff}
-.sw{display:inline-flex;align-items:center;gap:6px;cursor:pointer;user-select:none;color:var(--mut);font-size:12.5px}
-.sw input{display:none}
-.sw i{width:32px;height:18px;border-radius:10px;background:#2a3654;position:relative;transition:.2s}
+.sw{display:inline-flex;align-items:center;gap:6px;cursor:pointer;user-select:none;color:var(--mut);font-size:12.5px;flex:none}
+.sw input{position:absolute;opacity:0;width:1px;height:1px}
+.sw i{width:32px;height:18px;border-radius:10px;background:#2a3654;position:relative;transition:.2s;flex:none}
 .sw i::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#9fb0d0;transition:.2s}
 .sw input:checked+i{background:#2d6b46}
 .sw input:checked+i::after{left:16px;background:#e8fff1}
+.sw input:focus-visible+i{outline:2px solid #7aa2ff;outline-offset:2px}
 
-.tests{height:178px;display:flex;flex-direction:column}
-.thead{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--line)}
-.thead b{margin-right:auto}
+/* right column */
+.cards{flex:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.card{padding:6px 10px;border-top:3px solid var(--c);transition:opacity .2s}
+.card.p{--c:var(--P)} .card.i{--c:var(--I)} .card.d{--c:var(--D)}
+.card.off .mini,.card.off .val{opacity:.35}
+.ctop{display:flex;align-items:center;gap:8px}
+.badge{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;font-weight:800;font-size:15px;background:var(--c);color:#0b1220;flex:none}
+.ctop div{flex:1;min-width:0;line-height:1.15}
+.ctop b{font-size:13.5px}
+.ctop small{display:block;color:var(--c);font-size:10.5px;letter-spacing:.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini{height:50px;margin-top:3px}
+.val{font-size:12px;color:var(--mut);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.val b{color:var(--c)}
+.bangveil{position:absolute;inset:0;background:#0b1220c8;display:none;place-items:center;text-align:center;color:var(--mut);font-size:12.5px;padding:10px}
+body.bang .bangveil{display:grid}
+
+.resp{flex:1;min-height:0}
+.bottom{flex:1.15;min-height:0;display:flex;flex-direction:column;gap:6px}
+.tabs{flex:none;display:flex;gap:4px}
+.tab{background:none;border:1px solid var(--line);border-radius:8px;padding:2px 10px;color:var(--mut);cursor:pointer;font-size:12.5px}
+.tab.on{background:var(--panel2);color:var(--fg);border-color:#4a6aa8}
+.tab .cnt{display:inline-block;min-width:18px;padding:0 5px;margin-left:4px;border-radius:9px;background:#2a3654;color:var(--fg);font-size:11px;text-align:center}
+.tab.flash .cnt{background:var(--E);color:#2a2100}
+.tabpane{flex:1;min-height:0}
+.tabpane:not(.active){display:none}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row2 .panel{min-height:0}
+
+.tests{display:flex;flex-direction:column}
+.thead{display:flex;align-items:center;gap:8px;padding:5px 10px;border-bottom:1px solid var(--line)}
+.thead b{margin-right:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .thead small{color:var(--mut);font-weight:400}
-.tprog{height:3px;background:#1d2a45}.tprog div{height:100%;width:0;background:var(--E);transition:width .1s linear}
+.tprog{height:3px;background:#1d2a45;flex:none}.tprog div{height:100%;width:0;background:var(--E);transition:width .1s linear}
 .tbody{overflow:auto;flex:1}
 table{width:100%;border-collapse:collapse;font-size:12.5px}
 th{position:sticky;top:0;background:var(--panel);color:var(--mut);font-weight:500;text-align:right;padding:4px 8px;border-bottom:1px solid var(--line)}
 th:nth-child(2),td:nth-child(2){text-align:left}
-td{padding:4px 8px;text-align:right;border-bottom:1px solid #1b2640;white-space:nowrap}
-td.name{max-width:260px;overflow:hidden;text-overflow:ellipsis}
+td{padding:3px 8px;text-align:right;border-bottom:1px solid #1b2640;white-space:nowrap}
+td.name{max-width:240px;overflow:hidden;text-overflow:ellipsis}
 tr.hid td{opacity:.35}
 .swatch{display:inline-block;width:14px;height:4px;border-radius:2px;vertical-align:middle}
 .g{color:var(--good)} .o{color:var(--ok)} .b{color:var(--bad)}
 .tbtn{background:none;border:0;color:var(--mut);cursor:pointer;padding:0 3px}
 .tbtn:hover{color:var(--fg)}
-.empty{color:var(--dim);padding:14px 12px;font-size:13px}
+.empty{color:var(--dim);padding:10px 12px;font-size:13px}
 
-.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.card{padding:8px 10px 8px;border-top:3px solid var(--c);transition:opacity .2s}
-.card.p{--c:var(--P)} .card.i{--c:var(--I)} .card.d{--c:var(--D)}
-.card.off .mini,.card.off .val{opacity:.35}
-.ctop{display:flex;align-items:center;gap:8px}
-.badge{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:17px;background:var(--c);color:#0b1220;flex:none}
-.ctop div{flex:1;min-width:0;line-height:1.15}
-.ctop b{font-size:14px}
-.ctop small{display:block;color:var(--c);font-size:11px;letter-spacing:.6px;font-weight:600}
-.mini{height:62px;margin-top:4px}
-.val{font-size:12px;color:var(--mut);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.val b{color:var(--c)}
-.bangveil{position:absolute;inset:0;background:#0b1220c8;display:none;place-items:center;text-align:center;color:var(--mut);font-size:12.5px;padding:10px}
-body.bang .bangveil{display:grid}
-
-.resp{flex:1.35;min-height:190px}
-.row2{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:8px;min-height:160px}
-.row2 .panel{min-height:0}
-
-@media (max-width:1150px),(max-height:760px){
+/* ---- adapt to the window */
+.long{display:inline}
+@media (max-width:1450px){ .brand small{display:none} .chiplabel{display:none} }
+@media (max-width:1320px){ .long{display:none} .tnz label{display:none} }
+@media (max-height:859px){ .eqbar{display:none} }
+@media (max-height:740px){ .wf{height:84px} .mini{height:42px} .ctop small{display:none} }
+@media (max-height:690px){ .val{display:none} .mini{height:40px} }
+/* tall windows: show plots and the test bench together, no tabs */
+@media (min-height:1050px) and (min-width:1100px){
+  .tabs{display:none}
+  .tabpane:not(.active){display:revert}
+  .row2.tabpane{display:grid!important;flex:1}
+  .tests.tabpane{display:flex!important;flex:0 0 150px}
+  .wf{height:112px}
+  .mini{height:58px}
+  .resp{flex:1.25}
+}
+/* narrow or very short windows: one scrolling column */
+@media (max-width:1099px),(max-height:539px){
   body{height:auto;overflow:auto}
+  header{flex-wrap:wrap;white-space:normal}
+  #tune{height:auto;flex-wrap:wrap;padding-block:8px}
+  .tg{flex:1 1 260px}
+  #ltext{height:auto}
   main{grid-template-columns:1fr}
-  .scene{height:460px;flex:none}
-  .resp{height:280px;flex:none}
-  .row2{height:220px;flex:none}
-  #chips{max-width:none}
-  #lesson{flex-wrap:wrap}
+  .scene{height:440px;flex:none}
+  .resp{height:260px;flex:none}
+  .bottom{flex:none}
+  .tabs{display:none}
+  .tabpane:not(.active){display:revert}
+  .row2.tabpane{display:grid!important;height:220px;flex:none}
+  .tests.tabpane{display:flex!important;height:220px;flex:none}
+  .eqbar{display:flex}
 }
 @media (max-width:640px){
   .cards{grid-template-columns:1fr}
-  .row2{grid-template-columns:1fr;height:auto}
+  .row2.tabpane{grid-template-columns:1fr;height:auto}
   .row2 .panel{height:200px}
-  header{gap:8px}
+  .scene{height:380px}
 }
+@media (prefers-reduced-motion:reduce){ *{transition:none!important} }
 </style>
 </head>
 <body>
 <header>
   <div class="brand"><b><span>P</span><span>I</span><span>D</span> Playground</b><small>MEGN 300 · Intro to PID</small></div>
   <div class="seg" id="sysSeg">
-    <button data-sys="drone" class="on">🚁 Quadcopter altitude</button>
-    <button data-sys="pend">⚙️ Motor + pendulum arm</button>
+    <button data-sys="drone" class="on">🚁 Quadcopter<span class="long"> altitude</span></button>
+    <button data-sys="pend">⚙️ <span class="long">Motor + </span>pendulum arm</button>
   </div>
   <div class="seg" id="modeSeg">
     <button data-mode="pid" class="on">PID control</button>
@@ -173,34 +220,35 @@ body.bang .bangveil{display:grid}
 </header>
 
 <section id="lesson">
+  <span class="chiplabel">Scenarios</span>
   <div id="chips"></div>
-  <div id="ltext"><div id="ltitle"></div><div id="lbody"></div></div>
-  <div class="lnav"><button class="btn" id="prevL" title="←">◀ Prev</button><button class="btn primary" id="nextL" title="→">Next ▶</button></div>
+  <div class="lnav"><button class="btn sm" id="prevL" title="←">◀ Prev</button><button class="btn sm primary" id="nextL" title="→">Next ▶</button></div>
 </section>
+<div id="ltext"><span id="ltitle"></span><span id="lbody"></span></div>
 
 <section id="tune" aria-label="PID parameters">
   <div class="tscen"><small>Simulation settings</small><div id="scenName"></div><div id="scenSub"></div></div>
   <div class="tg p" id="tgP">
-    <label class="sw" title="Turn the P term on or off (key 1)"><input type="checkbox" id="onP" checked><i></i></label>
-    <span class="badge">P</span><label class="tlab" for="kp">K<sub>p</sub></label>
+    <label class="sw" title="Turn the P term on or off (key 1)"><input type="checkbox" id="onP" checked aria-label="P term on"><i></i></label>
+    <label class="tlab" for="kp">K<sub>p</sub></label>
     <input type="range" id="kp" aria-label="Kp"><input type="number" id="kpNum" class="tnum" aria-label="Kp value" inputmode="decimal">
     <span class="tdef" id="kpDef"></span>
   </div>
   <div class="tg i" id="tgI">
-    <label class="sw" title="Turn the I term on or off (key 2)"><input type="checkbox" id="onI" checked><i></i></label>
-    <span class="badge">I</span><label class="tlab" for="ki">K<sub>i</sub></label>
+    <label class="sw" title="Turn the I term on or off (key 2)"><input type="checkbox" id="onI" checked aria-label="I term on"><i></i></label>
+    <label class="tlab" for="ki">K<sub>i</sub></label>
     <input type="range" id="ki" aria-label="Ki"><input type="number" id="kiNum" class="tnum" aria-label="Ki value" inputmode="decimal">
     <span class="tdef" id="kiDef"></span>
   </div>
   <div class="tg d" id="tgD">
-    <label class="sw" title="Turn the D term on or off (key 3)"><input type="checkbox" id="onD" checked><i></i></label>
-    <span class="badge">D</span><label class="tlab" for="kd">K<sub>d</sub></label>
+    <label class="sw" title="Turn the D term on or off (key 3)"><input type="checkbox" id="onD" checked aria-label="D term on"><i></i></label>
+    <label class="tlab" for="kd">K<sub>d</sub></label>
     <input type="range" id="kd" aria-label="Kd"><input type="number" id="kdNum" class="tnum" aria-label="Kd value" inputmode="decimal">
     <span class="tdef" id="kdDef"></span>
   </div>
   <div class="tg x">
     <label class="sw" title="Stops the integral from accumulating while the actuator is maxed out"><input type="checkbox" id="aw" checked><i></i>Anti-windup</label>
-    <span class="tnz"><label for="noise">Sensor noise</label><input type="range" id="noise" min="0" max="1" step="0.01" value="0"><output id="noiseOut" class="num">off</output></span>
+    <span class="tnz" title="Sensor noise"><label for="noise">Noise</label><input type="range" id="noise" min="0" max="1" step="0.01" value="0" aria-label="Sensor noise"><output id="noiseOut" class="num">off</output></span>
   </div>
 </section>
 
@@ -221,11 +269,6 @@ body.bang .bangveil{display:grid}
       <span class="sep"></span>
       <span class="grp" id="distGrp"></span>
     </div>
-    <div class="panel tests">
-      <div class="thead"><b>Test bench <small>· step response from rest · metrics use a ±5% settling band</small></b><button class="btn" id="clearTests">Clear</button></div>
-      <div class="tprog"><div id="tprog"></div></div>
-      <div class="tbody" id="tbody"></div>
-    </div>
   </div>
 
   <div class="col">
@@ -234,7 +277,7 @@ body.bang .bangveil{display:grid}
         <div class="ctop"><span class="badge">P</span><div><b>Proportional</b><small>PRESENT · how far off now</small></div></div>
         <canvas class="mini" id="miniP"></canvas>
         <div class="val num" id="valP"></div>
-        <div class="bangveil">Bang-bang ignores how big the error is — only its sign.</div>
+        <div class="bangveil">Bang-bang ignores how big the error is, only its sign.</div>
       </div>
       <div class="panel card i" id="cardI">
         <div class="ctop"><span class="badge">I</span><div><b>Integral</b><small>PAST · error piled up over time</small></div></div>
@@ -250,9 +293,20 @@ body.bang .bangveil{display:grid}
       </div>
     </div>
     <div class="panel resp"><canvas id="resp"></canvas></div>
-    <div class="row2">
-      <div class="panel"><canvas id="errp"></canvas></div>
-      <div class="panel"><canvas id="terms"></canvas></div>
+    <div class="bottom">
+      <div class="tabs" role="tablist">
+        <button class="tab on" data-tab="plots" role="tab">Error &amp; P·I·D plots</button>
+        <button class="tab" data-tab="tests" role="tab">Test bench<span class="cnt" id="tcount">0</span></button>
+      </div>
+      <div class="row2 tabpane active" data-pane="plots">
+        <div class="panel"><canvas id="errp"></canvas></div>
+        <div class="panel"><canvas id="terms"></canvas></div>
+      </div>
+      <div class="panel tests tabpane" data-pane="tests">
+        <div class="thead"><b>Test bench <small>· step response from rest · ±5% settling band</small></b><button class="btn sm" id="clearTests">Clear</button></div>
+        <div class="tprog"><div id="tprog"></div></div>
+        <div class="tbody" id="tbody"></div>
+      </div>
     </div>
   </div>
 </main>
@@ -510,6 +564,8 @@ function finishTest(){
   while (list.length > 10) list.shift();
   sim.testing = null;
   renderTests();
+  const pane = document.querySelector('.tests.tabpane');
+  if (pane && pane.offsetParent === null) $('.tab[data-tab="tests"]').classList.add('flash');   // new result while the tab is hidden
 }
 function metrics(t, y, sp, y0, dur){
   const S0 = sp - y0, A = Math.abs(S0);
@@ -531,6 +587,7 @@ function metrics(t, y, sp, y0, dur){
 function renderTests(){
   const list = state.tests[state.sys], sys = S(), u = sys.unit;
   const tb = $('#tbody');
+  $('#tcount').textContent = list.length;
   if (!list.length){ tb.innerHTML = '<div class="empty">No tests yet. Press <b>▶ Run step test</b>, or pick a lesson above; each lesson runs its own test. Every run is overlaid on the response plot and scored here, so you can compare tunings side by side.</div>'; return; }
   const gr = (v, good, ok) => v==null ? 'b' : v <= good ? 'g' : v <= ok ? 'o' : 'b';
   let h = `<table><tr><th></th><th>Test</th><th>Rise (10→90%)</th><th>Overshoot</th><th>Settling ±5%</th><th>Steady-state err</th><th>IAE</th><th></th></tr>`;
@@ -556,6 +613,14 @@ $('#tbody').addEventListener('click', e => {
   if (b.dataset.del) list.splice(+b.dataset.del, 1);
   renderTests();
 });
+let activeTab = 'plots';
+function setTab(t){
+  activeTab = t;
+  document.querySelectorAll('.tab').forEach(b => { b.classList.toggle('on', b.dataset.tab===t); b.setAttribute('aria-selected', b.dataset.tab===t); });
+  document.querySelectorAll('.tabpane').forEach(p => p.classList.toggle('active', p.dataset.pane===t));
+  if (t==='tests') $('.tab[data-tab="tests"]').classList.remove('flash');
+}
+document.querySelectorAll('.tab').forEach(b => b.onclick = () => setTab(b.dataset.tab));
 $('#clearTests').onclick = () => { state.tests[state.sys] = []; state.colorIdx[state.sys] = 0; renderTests(); };
 
 // ---------------------------------------------------------------- UI wiring
@@ -591,9 +656,10 @@ function syncGainsUI(){
   const i = state.lesson[state.sys], sn = $('#scenName');
   sn.classList.toggle('custom', custom);
   sn.textContent = custom ? '✎ Custom PID tuning' : i < 0 ? 'Free play · default PID' : `${i+1}. ${LESSONS[state.sys][i].t}`;
-  $('#scenSub').textContent = state.mode==='bang' ? `Bang-bang (±${sys.bang.band} ${sys.unit}): gains not used. Move a slider to switch to PID`
-    : custom ? 'Your values are live. Click a scenario to restore its preset'
-    : 'Preset values loaded. Change any value to tune it yourself';
+  $('#scenSub').textContent = state.mode==='bang' ? `Bang-bang ±${sys.bang.band} ${sys.unit}: gains unused`
+    : custom ? 'Your values · click a scenario to reset'
+    : 'Preset values · change any to tune';
+  sn.title = sn.textContent; $('#scenSub').title = state.mode==='bang' ? 'Bang-bang mode ignores the gains. Move a slider to switch to PID control.' : custom ? 'The simulation is running on your values. Click any scenario button to restore its preset values.' : 'These are the preset values for this scenario. Change any of them to tune it yourself.';
 }
 function setGain(k, v){
   const sp = S().gains[k];
@@ -654,10 +720,12 @@ function syncLesson(){
   const i = state.lesson[state.sys], L = LESSONS[state.sys], custom = state.custom[state.sys];
   document.querySelectorAll('#chips button.chip').forEach((c, k) => { c.classList.toggle('on', k===i && !custom); c.classList.toggle('base', k===i && custom); });
   $('#customChip').hidden = !custom;
+  const row = $('#chips'), act = custom ? $('#customChip') : (i >= 0 ? row.querySelectorAll('button.chip')[i] : null);
+  if (act){ const l = act.offsetLeft - row.offsetLeft, r = l + act.offsetWidth; if (l < row.scrollLeft) row.scrollLeft = l - 8; else if (r > row.scrollLeft + row.clientWidth) row.scrollLeft = r - row.clientWidth + 8; }
   if (custom){
     const base = i < 0 ? 'free play' : `${i+1}. ${L[i].t}`;
     $('#ltitle').innerHTML = `✎ Custom PID tuning<span class="slide">started from ${base}</span>`;
-    $('#lbody').innerHTML = 'You changed the settings, and the simulation is running on <b>your values</b> right now (changed values are outlined in yellow). Press <b>▶ Run step test</b> (or <b>T</b>) to score your tuning on the test bench. Click any scenario button to restore its preset values.';
+    $('#lbody').innerHTML = 'The simulation is running on <b>your values</b> (changed ones are outlined in yellow, with the preset shown above them). Press <b>▶ Run step test</b> (or <b>T</b>) to score your tuning, or click any scenario to restore its preset.';
   } else if (i < 0){
     $('#ltitle').innerHTML = state.sys==='drone' ? 'Free play: quadcopter altitude hold' : 'Free play: motor-driven pendulum arm';
     $('#lbody').innerHTML = state.sys==='drone'
@@ -882,7 +950,7 @@ function drawPendScene(ctx, w, h, dt){
   ctx.strokeStyle = 'rgba(120,150,200,0.07)'; ctx.lineWidth = 1;
   for (let x=0;x<w;x+=24){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
   for (let y=0;y<h;y+=24){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
-  const R = Math.min(w*0.34, h*0.38), px = w*0.5, py = h*0.5;
+  const R = Math.max(50, Math.min(w*0.33, h*0.5 - 60)), px = w*0.5, py = h*0.5;
   if (geo.R !== R || geo.px !== px) fx.trail = [];
   geo.px = px; geo.py = py; geo.R = R;
   const tip = a => [px + Math.sin(a)*R, py + Math.cos(a)*R];
@@ -907,7 +975,7 @@ function drawPendScene(ctx, w, h, dt){
   ctx.strokeStyle = C.SP; ctx.lineWidth = 3; ctx.setLineDash([9,6]); ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(sx,sy); ctx.stroke(); ctx.setLineDash([]);
   ctx.beginPath(); ctx.arc(sx, sy, 15, 0, 7); ctx.stroke();
   const [lx, ly] = [px + Math.sin(sa)*(R+70), py + Math.cos(sa)*(R+70)];
-  pill(ctx, lx, ly, `Set point ${fmt(sim.sp,0)}°`, C.SP, '#06210f', 'center');
+  pill(ctx, clamp(lx, 60, w-60), clamp(ly, 14, h-14), `Set point ${fmt(sim.sp,0)}°`, C.SP, '#06210f', 'center');
   // trail
   const [tx, ty] = tip(p.th);
   fx.trail.push([tx, ty]); if (fx.trail.length > 70) fx.trail.shift();
@@ -1066,6 +1134,7 @@ function legend(ctx, x, y, items){
 
 function drawResp(){
   const { ctx, w, h } = fit($('#resp')), sys = S(), H = sim.hist;
+  if (w < 40 || h < 40) return;
   ctx.clearRect(0,0,w,h);
   text(ctx, `Response: ${sys.pvName.toLowerCase()} vs time`, 12, 13, '#dfe7f5', 13, 'left', 700);
   const dur = sys.testDur, tNow = sim.t;
@@ -1076,8 +1145,9 @@ function drawResp(){
   for (let i=i0;i<H.pv.length;i++){ hi = Math.max(hi, H.pv[i]); lo = Math.min(lo, H.pv[i]); }
   for (const r of tests) for (const v of r.y){ hi = Math.max(hi, v); lo = Math.min(lo, v); }
   hi = Math.min(hi, sys.pvHi*2.2); lo = Math.max(lo, sys.pvLo - (sys.pvHi-sys.pvLo));
-  const top = { x:46, y:26, w:w-58, h:(h-26-18)*0.72 }, bot = { x:46, y:top.y+top.h+14, w:w-58, h:(h-26-18)*0.28-14 };
-  const A = frame(ctx, top, x0, x1, lo, hi, { noXLab:true });
+  const strip = h >= 250;   // small u(t) strip only when there is room (the P·I·D plot also shows u)
+  const top = { x:46, y:26, w:w-58, h:strip ? (h-26-18)*0.72 : h-26-20 }, bot = { x:46, y:top.y+top.h+14, w:w-58, h:(h-26-18)*0.28-14 };
+  const A = frame(ctx, top, x0, x1, lo, hi, { noXLab:strip, xu:' s' });
   // latest test annotations
   const last = tests[tests.length-1];
   if (last && last.m){
@@ -1107,6 +1177,7 @@ function drawResp(){
   tests.slice(-3).forEach(r => leg.push([r.label.length > 26 ? r.label.slice(0,25)+'…' : r.label, r.color]));
   legend(ctx, Math.max(200, w*0.3), 13, leg);
   // u strip
+  if (!strip) return;
   const B = frame(ctx, bot, x0, x1, sys.uMin, sys.uMax, { yn:2, xu:' s' });
   const hold = sys.hold(sim.plant, sim.sp);
   ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(bot.x, B.Y(hold)); ctx.lineTo(bot.x+bot.w, B.Y(hold)); ctx.stroke(); ctx.setLineDash([]);
@@ -1118,10 +1189,11 @@ function drawResp(){
 
 function drawErr(){
   const { ctx, w, h } = fit($('#errp')), sys = S(), H = sim.hist;
+  if (w < 40 || h < 40) return;
   ctx.clearRect(0,0,w,h);
-  text(ctx, 'Error anatomy: past · present · future', 12, 13, '#dfe7f5', 13, 'left', 700);
+  text(ctx, w > 470 ? 'Error anatomy: past · present · future' : 'Error anatomy', 12, 13, '#dfe7f5', 13, 'left', 700);
   const tNow = sim.t, x0 = tNow - sys.errPast, x1 = tNow + sys.errFuture;
-  const r = { x:40, y:40, w:w-50, h:h-62 };
+  const r = { x:40, y:44, w:w-50, h:h-64 };
   const i0 = firstIdx(H.t, x0);
   let m = sys.minErrRange; for (let i=i0;i<H.e.length;i++) m = Math.max(m, Math.abs(H.e[i]));
   fx.errRange = fx.errRange ? lerp(fx.errRange, m*1.15, 0.08) : m*1.15; const R = fx.errRange;
@@ -1149,20 +1221,20 @@ function drawErr(){
   ctx.strokeStyle = C.P; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(xn, A.Y(0)); ctx.lineTo(xn, A.Y(clamp(e, -R, R))); ctx.stroke();
   ctx.fillStyle = C.E; ctx.beginPath(); ctx.arc(xn, A.Y(clamp(e,-R,R)), 4.5, 0, 7); ctx.fill();
   // labels
-  text(ctx, '◀ PAST: shaded area = ∫e dt → I', r.x + 6, r.y - 9, C.I, 11, 'left', 700);
+  text(ctx, w > 420 ? '◀ PAST: shaded area = ∫e dt → I' : '◀ PAST: area → I', r.x + 2, r.y - 9, C.I, 11, 'left', 700);
   text(ctx, 'NOW: e → P', xn, r.y + r.h + 11, C.P, 11, 'center', 700);
-  text(ctx, 'FUTURE: slope → D ▶', r.x + r.w - 2, r.y - 9, C.D, 11, 'right', 700);
+  text(ctx, w > 420 ? 'FUTURE: slope → D ▶' : 'slope → D ▶', r.x + r.w - 2, r.y - 9, C.D, 11, 'right', 700);
   text(ctx, sys.unit, r.x - 5, r.y - 8, C.dim, 10, 'right');
-  ctx.fillStyle='rgba(11,18,32,0.75)'; rr(ctx, r.x+4, r.y+r.h-22, 190, 18, 5); ctx.fill();
-  text(ctx, `e = ${sfmt(e, 1)}   de/dt = ${sfmt(sim.dedt, 1)} ${sys.unit}/s`, r.x + 10, r.y + r.h - 13, '#c3cee4', 11);
+  text(ctx, `e = ${sfmt(e, 1)}   de/dt = ${sfmt(sim.dedt, 1)} ${sys.unit}/s`, w - 10, 13, '#c3cee4', 11, 'right');
 }
 
 function drawTerms(){
   const { ctx, w, h } = fit($('#terms')), sys = S(), H = sim.hist;
+  if (w < 40 || h < 40) return;
   ctx.clearRect(0,0,w,h);
-  text(ctx, 'Who is doing the work? P, I, D over time', 12, 13, '#dfe7f5', 13, 'left', 700);
+  text(ctx, w > 380 ? 'Who is doing the work? P, I, D over time' : 'P, I, D over time', 12, 13, '#dfe7f5', 13, 'left', 700);
   const dur = sys.testDur, x1 = Math.max(dur, sim.t), x0 = x1 - dur;
-  const r = { x:44, y:40, w:w-54, h:h-62 };
+  const r = { x:44, y:42, w:w-54, h:h-62 };
   const i0 = firstIdx(H.t, x0), span = sys.uMax - sys.uMin;
   let lo = Math.min(sys.uMin, -0.3*span), hi = sys.uMax*1.1;
   for (let i=i0;i<H.t.length;i++){ for (const k of ['P','I','D']){ const v = H[k][i]; if (v > hi) hi = v; if (v < lo) lo = v; } }
@@ -1181,7 +1253,7 @@ function drawTerms(){
   line(ctx, H.t, H.u, A.X, A.Y, i0, '#ffffff', 1.4, 0.75);
   ctx.restore();
   text(ctx, sys.uUnit, r.x - 5, r.y - 8, C.dim, 10, 'right');
-  legend(ctx, r.x + 4, r.y - 10, [['P', C.P], ['I', C.I], ['D', C.D], ['u (clipped)', '#fff'], [sys.holdName, 'rgba(255,255,255,0.5)', true]]);
+  legend(ctx, r.x + 4, 30, w > 470 ? [['P', C.P], ['I', C.I], ['D', C.D], ['u (clipped)', '#fff'], [sys.holdName, 'rgba(255,255,255,0.5)', true]] : [['P', C.P], ['I', C.I], ['D', C.D], ['u', '#fff'], ['hold', 'rgba(255,255,255,0.5)', true]]);
 }
 
 // ---------------------------------------------------------------- mini card widgets
